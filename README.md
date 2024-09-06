@@ -10,5 +10,15 @@ gpt2
 
 It has unicode support and is able to handle UTF-8 encoded character literals ie "\u0001".
 
+## Usage
+
+```swift
+let tokenizerSwift = try? await TikTokenSwift.shared.getEncoding(.gpt4)
+let tokens = try? tokenizerSwift?.encode(value: " \\u0850")
+let tokenCount = tokens?.count
+
+let reverted =  tokenizerSwift?.decode(value: tokens!)
+```
+
 Known Issues:
 Texts with encoded hex values ie " \x850" will not get encoded properly and will return the wrong values
