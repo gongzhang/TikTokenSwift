@@ -21,4 +21,4 @@ let reverted =  tokenizerSwift?.decode(value: tokens!)
 ```
 
 ## Known Issues:
-- Texts with encoded hex values ie " \x850" will not get encoded properly and will return the wrong values
+- ~~Texts with encoded hex values ie " \x850" will not get encoded properly and will return the wrong values~~ Fixed
