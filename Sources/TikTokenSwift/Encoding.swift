@@ -45,7 +45,7 @@ public class Encoding {
             }
         }
         
-        return try coreBpe.encodeOrdinaryNative(text: value.convertFromUnicodeString() ?? value)
+        return try coreBpe.encodeOrdinaryNative(text: value.convertFromPythonHexCodeToUnicodeCode().convertFromUnicodeString() ?? value)
     }
     
     public func decode(value: [Int]) -> String {
