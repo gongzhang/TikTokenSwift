@@ -36,10 +36,10 @@ public class Encoding {
         self.coreBpe = .init(encoder: mergedRanks, decoder: decoder, regexTls: [regex])
     }
     
-    public func encode(value: String, allowedSpecialTokens: Set<String> = []) throws -> [Int] {
-        if (allowedSpecialTokens.contains("all") == false) {
+    public func encode(value: String, treatSpecialAsNormal: Bool = false) throws -> [Int] {
+        if (treatSpecialAsNormal == false) {
             for specialToken in specialTokens.keys {
-                if (value.contains(specialToken) && allowedSpecialTokens.contains(specialToken) == false) {
+                if (value.contains(specialToken)) {
                     throw TikTokenError.disallowedToken(specialToken)
                 }
             }
