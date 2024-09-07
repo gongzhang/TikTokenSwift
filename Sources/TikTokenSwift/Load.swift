@@ -12,24 +12,29 @@ struct Load {
     
     static func loadTiktokenBpe(vocab: Vocab, decoder: FileDecoder = FileDecoder()) async throws -> [[UInt8]: Int] {
         let vocabData = try await vocab.loadVocabData()
-        return try decoder.decode(vocabData)
+        var fileBpe = try decoder.decode(vocabData)
+        addSpecialTokensToBpe(bpe: &fileBpe, specialTokens: vocab.specialTokens)
+        return fileBpe
     }
     
     static func dataGymToMergeableBpeRanks(vocab: Vocab) async throws -> [[UInt8]: Int] {
         let encoderData = try await vocab.loadVocabData()
         var fileBpe = try createMergableBpeFromDataGym(vocabData: encoderData)
         // Add the special string to the rank
-        let special = vocab.specialTokens
-        for key in special.keys {
-            let utf8EncodedKey: [UInt8] = Array(key.utf8)
-            fileBpe[utf8EncodedKey] = special[key]
-        }
+        addSpecialTokensToBpe(bpe: &fileBpe, specialTokens: vocab.specialTokens)
         let encoderValidationData = try await vocab.loadVocabValidationData()
         let isValidated = validateBpeGymData(encoderJsonData: encoderValidationData, mergedBpe: fileBpe)
         if !isValidated {
             throw TikTokenError.validation
         }
         return fileBpe
+    }
+    
+    static func addSpecialTokensToBpe(bpe: inout [[UInt8]: Int], specialTokens: [String: Int]) {
+        for key in specialTokens.keys {
+            let utf8EncodedKey: [UInt8] = Array(key.utf8)
+            bpe[utf8EncodedKey] = specialTokens[key]
+        }
     }
     
     static func createMergableBpeFromDataGym(vocabData: Data) throws -> [[UInt8]: Int] {
@@ -102,6 +107,8 @@ struct Load {
             }
         }
         var bpeRanks: [[UInt8]: Int] = [:]
+        // Think there was a bug in the source OpenAI code since the validation json first 256 values did not match what their code returned.
+        // Using the values gotten from adding the extra characters instead since they match the validation json
         for num in rangeToMaxValue {
             let valInt = Int(num)
             bpeRanks[theChars[valInt]] = valInt

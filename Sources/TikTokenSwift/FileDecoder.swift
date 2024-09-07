@@ -12,7 +12,7 @@ struct FileDecoder {
         var parseKey = true
         var lineKey:[CChar] = []
         var lineRank:[CChar] = []
-        var result: [[UInt8]: Int] = .init()
+        var result: [[UInt8]: Int] = [:]
         for sub in data {
             // Have we hit the space in the line?
             if (sub == 32) {
