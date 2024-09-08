@@ -1,13 +1,14 @@
 TikTokenSwift is a Swift implementation of OpenAI's Tiktoken tokenizer.
 
 Currently it supports the following tokenizers:
-o200k_base
-cl100k_base
-p50k_edit
-p50k_base
-r50k_base
+- o200k_base
+- cl100k_base
+- p50k_edit
+- p50k_base
+- r50k_base
+- gpt2
 
-It has unicode support and is able to handle UTF-8 encoded character literals ie "\u0001".
+It has unicode support and is able to handle UTF-8 encoded character literals ie "\u0001". It also supporsts the  disallowed_special while encoding so special strings are treated as normal strings. It also supports non-english characters
 
 ## Usage
 
