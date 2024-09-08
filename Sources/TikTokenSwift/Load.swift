@@ -19,14 +19,10 @@ struct Load {
     
     static func dataGymToMergeableBpeRanks(vocab: Vocab) async throws -> [[UInt8]: Int] {
         let encoderData = try await vocab.loadVocabData()
-        var fileBpe = try createMergableBpeFromDataGym(vocabData: encoderData)
+        let encoderValidationData = try await vocab.loadVocabValidationData()
+        var fileBpe = try createMergableBpeFromDataGym(vocabData: encoderData, encoderValidationData: encoderValidationData, specialTokens: vocab.specialTokens)
         // Add the special string to the rank
         addSpecialTokensToBpe(bpe: &fileBpe, specialTokens: vocab.specialTokens)
-        let encoderValidationData = try await vocab.loadVocabValidationData()
-        let isValidated = validateBpeGymData(encoderJsonData: encoderValidationData, mergedBpe: fileBpe)
-        if !isValidated {
-            throw TikTokenError.validation
-        }
         return fileBpe
     }
     
@@ -37,7 +33,7 @@ struct Load {
         }
     }
     
-    static func createMergableBpeFromDataGym(vocabData: Data) throws -> [[UInt8]: Int] {
+    static func createMergableBpeFromDataGym(vocabData: Data, encoderValidationData: Data, specialTokens: [String: Int]) throws -> [[UInt8]: Int] {
         let maxVal = Int(pow(2.0, 8))
         let rangeToMaxValue = 0...UInt8(maxVal-1)
         var theChars: [[UInt8]] = []
@@ -45,7 +41,7 @@ struct Load {
             let unicodeValue = Unicode.Scalar(currentCharacterValue)
             let scaleVale = unicodeValue.properties.generalCategory
             // Logic obtained by adding values Python's isPrintable returned to a set and then adding the categories that weren't in that set to see what they were
-            return scaleVale  != .control && scaleVale != .format && scaleVale != .spaceSeparator
+            return unicodeValue.pythonIsPrintable && scaleVale != .spaceSeparator
         }
         var byteToByte: [Character: Int] = [:]
         for val in filtered {
@@ -107,24 +103,44 @@ struct Load {
             }
         }
         var bpeRanks: [[UInt8]: Int] = [:]
-        // Think there was a bug in the source OpenAI code since the validation json first 256 values did not match what their code returned.
-        // Using the values gotten from adding the extra characters instead since they match the validation json
         for num in rangeToMaxValue {
             let valInt = Int(num)
-            bpeRanks[theChars[valInt]] = valInt
+            let singleChar:[UInt8] = [filtered[valInt]]
+            bpeRanks[singleChar] = valInt
         }
         n = bpeRanks.count
         for num in 0..<oldStyleFile.count {
             let currTuple = oldStyleFile[num]
-            let mergedVal = currTuple.first + currTuple.second
+            let mergedVal = mapCharsFor(mapDict: byteToByte, str: currTuple.first) + mapCharsFor(mapDict: byteToByte, str: currTuple.second)
             bpeRanks[mergedVal] = n
             n += 1
+        }
+        if !TikTokenSwift.gpt2Validated {
+            let isValid = validateBpeGymData(encoderJsonData: encoderValidationData, mergedBpe: bpeRanks, mapDict: byteToByte, specialTokens: specialTokens)
+            if !isValid {
+                throw TikTokenError.validation
+            }
         }
         
         return bpeRanks
     }
     
-    static func validateBpeGymData(encoderJsonData: Data, mergedBpe: [[UInt8]: Int]) -> Bool {
+    static func mapCharsFor(mapDict: [Character: Int], str: [UInt8]) -> [UInt8] {
+        var strCopy = str
+        strCopy.append(0)
+        var ret: [UInt8] = []
+        let currString = String(cString: strCopy)
+        for char in currString {
+            if let mappedChar = mapDict[char] {
+                let map: UInt8 = UInt8(mappedChar)
+                ret.append(map)
+            }
+            
+        }
+        return ret
+    }
+    
+    static func validateBpeGymData(encoderJsonData: Data, mergedBpe: [[UInt8]: Int], mapDict: [Character: Int], specialTokens: [String: Int]) -> Bool {
         // Going old school since it's easier to compare dict to dict
         let encodedJson: [String:Int]
         do {
@@ -138,13 +154,16 @@ struct Load {
         
         for key in encodedJson.keys {
             let dictVal = encodedJson[key]
-            
-            let byteArr: [UInt8] = Array(key.convertFromUnicodeString()!.utf8)
+            guard let convertedKey = key.convertFromUnicodeString() else {
+                return false
+            }
+            let byteArr: [UInt8] = mapCharsFor(mapDict: mapDict, str: Array(convertedKey.utf8))
             let byteVal = mergedBpe[byteArr]
-            if dictVal != byteVal {
+            if dictVal != byteVal && !specialTokens.keys.contains(key) {
                 return false
             }
         }
+        TikTokenSwift.gpt2Validated = true
         return true
     }
 }
