@@ -115,7 +115,9 @@ struct Load {
             bpeRanks[mergedVal] = n
             n += 1
         }
-        if !TikTokenSwift.gpt2Validated {
+        
+        let gpt2Validated = UserDefaults.standard.object(forKey: "tiktokenGptValidated") as? Bool ?? false
+        if !gpt2Validated {
             let isValid = validateBpeGymData(encoderJsonData: encoderValidationData, mergedBpe: bpeRanks, mapDict: byteToByte, specialTokens: specialTokens)
             if !isValid {
                 throw TikTokenError.validation
@@ -163,7 +165,7 @@ struct Load {
                 return false
             }
         }
-        TikTokenSwift.gpt2Validated = true
+        UserDefaults.standard.setValue(true, forKey: "tiktokenGptValidated")
         return true
     }
 }

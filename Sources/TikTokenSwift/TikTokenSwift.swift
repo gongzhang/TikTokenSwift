@@ -10,7 +10,6 @@ import Foundation
 public struct TikTokenSwift {
     
     public static let shared: TikTokenSwift = TikTokenSwift()
-    internal static var gpt2Validated = false
     
     public func getEncoding(_ model: GptModel) async throws -> Encoding? {
         let vocab = model.modelForEncoder

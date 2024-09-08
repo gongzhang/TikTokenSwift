@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TikTokenError: LocalizedError {
+public enum TikTokenError: LocalizedError {
     case invalidEncoderParams
     case invalidVocabParams
     case bpeCountMismatch(Int, Int)
@@ -18,7 +18,7 @@ enum TikTokenError: LocalizedError {
     case disallowedToken(String)
     case unicode
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
             
         case .invalidEncoderParams:
@@ -42,7 +42,7 @@ enum TikTokenError: LocalizedError {
         }
     }
     
-    var failureReason: String? {
+    public var failureReason: String? {
         switch self {
             
         case .invalidEncoderParams:

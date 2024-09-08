@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Model {
+struct Model {
     static func getEncoding(_ model: GptModel) -> Vocab? {
         return model.modelForEncoder
     }

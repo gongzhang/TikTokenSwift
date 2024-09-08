@@ -13,8 +13,9 @@ Currently it supports the following tokenizers:
 - Support for UTF-8 encoded character literals ie "\u0001".
 - Supports the disallowed_special option for encoding so special tokens are treated as normal strings.
 - Supports non-english characters and emojis
+- Caches models to disk after download to speed up subsequent encoding
 
-## Usage
+## Code Example
 
 ```swift
 let tokenizerSwift = try? await TikTokenSwift.shared.getEncoding(.gpt4)
