@@ -6,7 +6,6 @@ cl100k_base
 p50k_edit
 p50k_base
 r50k_base
-gpt2
 
 It has unicode support and is able to handle UTF-8 encoded character literals ie "\u0001".
 
@@ -22,3 +21,4 @@ let reverted =  tokenizerSwift?.decode(value: tokens!)
 
 ## Known Issues:
 - ~~Texts with encoded hex values ie " \x850" will not get encoded properly and will return the wrong values~~ Fixed
+- Encoding with a special token in string ie "Hello <|endoftext|>" with allowed_special="all" isn't implemented
