@@ -8,7 +8,11 @@ Currently it supports the following tokenizers:
 - r50k_base
 - gpt2
 
-It has unicode support and is able to handle UTF-8 encoded character literals ie "\u0001". It also supporsts the  disallowed_special while encoding so special strings are treated as normal strings. It also supports non-english characters
+## Features
+- Unicode support
+- Support for UTF-8 encoded character literals ie "\u0001".
+- Supports the disallowed_special option for encoding so special tokens are treated as normal strings.
+- Supports non-english characters and emojis
 
 ## Usage
 
