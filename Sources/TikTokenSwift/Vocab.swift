@@ -16,7 +16,7 @@ enum SpecialTokenConstants: String {
     case ENDOFPROMPT = "<|endofprompt|>"
 }
 
-public struct Vocab {
+internal struct Vocab {
     public let name: String
     public let remoteUrlString: String
     public let encoderUrlString: String?
@@ -193,7 +193,7 @@ public struct Vocab {
     }
 }
 
-public extension Vocab {
+internal extension Vocab {
     static var gpt2: Vocab {
         Vocab(name: "gpt2",
               remoteUrlString: "https://openaipublic.blob.core.windows.net/gpt-2/encodings/main/vocab.bpe",

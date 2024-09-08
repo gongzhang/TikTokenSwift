@@ -11,7 +11,7 @@ public struct TikTokenSwift {
     
     public static let shared: TikTokenSwift = TikTokenSwift()
     
-    public func getEncoding(_ model: GptModel) async throws -> Encoding? {
+    public func getEncoding(model: GptModel) async throws -> Encoding? {
         let vocab = model.modelForEncoder
         let encoder = try await loadRanks(vocab)
         let regex = try NSRegularExpression(pattern: vocab.pattern)
