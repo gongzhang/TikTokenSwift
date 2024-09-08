@@ -21,7 +21,7 @@ public struct TikTokenSwift {
 }
 
 private extension TikTokenSwift {
-    func loadRanks(_ vocab: Vocab) async throws -> [[UInt8]: Int] {
+    func loadRanks(_ vocab: Vocab) async throws -> BpeRanks {
         if vocab.name == "gpt2" {
             return try await Load.dataGymToMergeableBpeRanks(vocab: vocab)
         } else {

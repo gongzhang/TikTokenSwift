@@ -10,14 +10,14 @@ import CryptoKit
 
 struct Load {
     
-    static func loadTiktokenBpe(vocab: Vocab, decoder: FileDecoder = FileDecoder()) async throws -> [[UInt8]: Int] {
+    static func loadTiktokenBpe(vocab: Vocab, decoder: FileDecoder = FileDecoder()) async throws -> BpeRanks {
         let vocabData = try await vocab.loadVocabData()
         var fileBpe = try decoder.decode(vocabData)
         addSpecialTokensToBpe(bpe: &fileBpe, specialTokens: vocab.specialTokens)
         return fileBpe
     }
     
-    static func dataGymToMergeableBpeRanks(vocab: Vocab) async throws -> [[UInt8]: Int] {
+    static func dataGymToMergeableBpeRanks(vocab: Vocab) async throws -> BpeRanks {
         let encoderData = try await vocab.loadVocabData()
         let encoderValidationData = try await vocab.loadVocabValidationData()
         var fileBpe = try createMergableBpeFromDataGym(vocabData: encoderData, encoderValidationData: encoderValidationData, specialTokens: vocab.specialTokens)
@@ -26,14 +26,14 @@ struct Load {
         return fileBpe
     }
     
-    static func addSpecialTokensToBpe(bpe: inout [[UInt8]: Int], specialTokens: [String: Int]) {
+    static func addSpecialTokensToBpe(bpe: inout BpeRanks, specialTokens: [String: Int]) {
         for key in specialTokens.keys {
             let utf8EncodedKey: [UInt8] = Array(key.utf8)
             bpe[utf8EncodedKey] = specialTokens[key]
         }
     }
     
-    static func createMergableBpeFromDataGym(vocabData: Data, encoderValidationData: Data, specialTokens: [String: Int]) throws -> [[UInt8]: Int] {
+    static func createMergableBpeFromDataGym(vocabData: Data, encoderValidationData: Data, specialTokens: [String: Int]) throws -> BpeRanks {
         let maxVal = Int(pow(2.0, 8))
         let rangeToMaxValue = 0...UInt8(maxVal-1)
         var theChars: [[UInt8]] = []
@@ -102,7 +102,7 @@ struct Load {
                 }
             }
         }
-        var bpeRanks: [[UInt8]: Int] = [:]
+        var bpeRanks: BpeRanks = [:]
         for num in rangeToMaxValue {
             let valInt = Int(num)
             let singleChar:[UInt8] = [filtered[valInt]]
@@ -142,7 +142,7 @@ struct Load {
         return ret
     }
     
-    static func validateBpeGymData(encoderJsonData: Data, mergedBpe: [[UInt8]: Int], mapDict: [Character: Int], specialTokens: [String: Int]) -> Bool {
+    static func validateBpeGymData(encoderJsonData: Data, mergedBpe: BpeRanks, mapDict: [Character: Int], specialTokens: [String: Int]) -> Bool {
         // Going old school since it's easier to compare dict to dict
         let encodedJson: [String:Int]
         do {

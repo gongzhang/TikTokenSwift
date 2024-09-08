@@ -12,14 +12,14 @@ final class TikTokenSwiftTests: XCTestCase {
     }
     
     func testSimple() async throws {
-        var enc = try? await TikTokenSwift.shared.getEncoding(.gpt2)
+        var enc = try? await TikTokenSwift.shared.getEncoding(model: .gpt2)
         XCTAssertNotNil(enc)
         var helloValue = try? enc!.encode(value: "hello world")
         XCTAssertNotNil(helloValue)
         XCTAssertEqual(helloValue!, [31373, 995])
         
         
-        enc = try? await TikTokenSwift.shared.getEncoding(.gpt4)
+        enc = try? await TikTokenSwift.shared.getEncoding(model: .gpt4)
         XCTAssertNotNil(enc)
         helloValue = try? enc!.encode(value: "hello world")
         XCTAssertNotNil(helloValue)
@@ -30,7 +30,7 @@ final class TikTokenSwiftTests: XCTestCase {
     
     func testSimpleRepeated() async throws {
 
-        let enc = try? await TikTokenSwift.shared.getEncoding(.gpt2)
+        let enc = try? await TikTokenSwift.shared.getEncoding(model: .gpt2)
         XCTAssertNotNil(enc)
         var encodedString = try? enc!.encode(value: "0")
         XCTAssertNotNil(encodedString)

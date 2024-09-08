@@ -8,7 +8,7 @@
 import Foundation
 
 class CoreBPE {
-    private let encoder: [[UInt8]: Int]
+    private let encoder: BpeRanks
     private let decoder: [Int: [UInt8]]
     private let regexTls: [NSRegularExpression]
     

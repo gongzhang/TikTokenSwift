@@ -8,11 +8,11 @@
 import Foundation
 
 struct FileDecoder {
-    func decode(_ data: Data) throws -> [[UInt8]: Int] {
+    func decode(_ data: Data) throws -> BpeRanks {
         var parseKey = true
         var lineKey:[CChar] = []
         var lineRank:[CChar] = []
-        var result: [[UInt8]: Int] = [:]
+        var result: BpeRanks = [:]
         for sub in data {
             // Have we hit the space in the line?
             if (sub == 32) {

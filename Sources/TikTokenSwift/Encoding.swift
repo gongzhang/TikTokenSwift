@@ -11,13 +11,13 @@ public class Encoding {
     
     private let name: String
     private let regex: NSRegularExpression // Regex
-    private let mergedRanks: [[UInt8]: Int]
+    private let mergedRanks: BpeRanks
     private let specialTokens: [String: Int]
     private let explicitNVocab: Int?
     
     private let coreBpe: CoreBPE
     
-    init(name: String, regex: NSRegularExpression, mergedRanks: [[UInt8]: Int], specialTokens: [String: Int], explicitNVocab: Int? = nil) throws {
+    init(name: String, regex: NSRegularExpression, mergedRanks: BpeRanks, specialTokens: [String: Int], explicitNVocab: Int? = nil) throws {
         self.name = name
         self.regex = regex
         self.mergedRanks = mergedRanks

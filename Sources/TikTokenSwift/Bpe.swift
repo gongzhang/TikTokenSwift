@@ -7,9 +7,9 @@
 
 import Foundation
 
-typealias Bpe = [[UInt8]: Int]
+typealias BpeRanks = [[UInt8]: Int]
 
-extension Bpe {
+extension BpeRanks {
     var keyValueSwapped: [Int: [UInt8]] {
         reduce(into: [:], { $0[$1.value] = $1.key })
     }
