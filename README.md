@@ -25,6 +25,6 @@ let tokenCount = tokens?.count
 let reverted =  tokenizerSwift?.decode(value: tokens!)
 ```
 
-## Known Issues:
+## Known Issues/Limitations:
 - ~~Texts with encoded hex values ie " \x850" will not get encoded properly and will return the wrong values~~ Fixed
-- Encoding with a special token in string ie "Hello <|endoftext|>" with allowed_special="all" isn't implemented
+- Encoding with a special token in string ie "Hello <|endoftext|>" with allowed_special="all" is currently unimplemented
