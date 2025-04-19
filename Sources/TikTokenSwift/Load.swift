@@ -2,8 +2,12 @@ import Foundation
 import CryptoKit
 
 struct Load {    
-    static func loadTiktokenBpe(vocab: Vocab, decoder: FileDecoder = FileDecoder()) async throws -> BpeRanks {
-        let vocabData = try await vocab.loadVocabData()
+    static func loadTiktokenBpe(vocab: Vocab, at url: URL? = nil, decoder: FileDecoder = FileDecoder()) async throws -> BpeRanks {
+        let vocabData = if let url {
+            try await URLSession.shared.data(from: url).0
+        } else {
+            try await vocab.loadVocabData()
+        }
         var fileBpe = try decoder.decode(vocabData)
         addSpecialTokensToBpe(bpe: &fileBpe, specialTokens: vocab.specialTokens)
         return fileBpe
