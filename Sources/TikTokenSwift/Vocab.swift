@@ -8,7 +8,7 @@ enum SpecialTokenConstants: String {
     case ENDOFPROMPT = "<|endofprompt|>"
 }
 
-internal struct Vocab {
+public struct Vocab {
     private static let tokenizersDirectory = "TikTokenSwift"
     
     public let name: String
@@ -200,7 +200,7 @@ internal struct Vocab {
     }
 }
 
-internal extension Vocab {
+public extension Vocab {
     static var gpt2: Vocab {
         Vocab(name: "gpt2",
               remoteUrlString: "https://openaipublic.blob.core.windows.net/gpt-2/encodings/main/vocab.bpe",
