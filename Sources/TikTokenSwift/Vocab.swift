@@ -36,7 +36,7 @@ internal struct Vocab {
         }
         if let vocabUrl = try getLocalVocabLocation() {
             if #available(iOS 16.0, *) {
-                if let fileData = FileManager.default.contents(atPath: vocabUrl.path()) {
+                if let fileData = FileManager.default.contents(atPath: vocabUrl.path(percentEncoded: false)) {
                     return fileData
                 } else {
                     throw TikTokenError.file
@@ -66,7 +66,7 @@ internal struct Vocab {
         
         if let vocabEncoderUrl = try getLocalVocabEncoderLocation() {
             if #available(iOS 16.0, *) {
-                if let fileData = FileManager.default.contents(atPath: vocabEncoderUrl.path()) {
+                if let fileData = FileManager.default.contents(atPath: vocabEncoderUrl.path(percentEncoded: false)) {
                     return fileData
                 } else {
                     throw TikTokenError.invalidEncoderParams
@@ -106,8 +106,8 @@ internal struct Vocab {
         var doesExist: Bool
         let appPath: String
         if #available(iOS 16.0, *) {
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path())
-            appPath = appSupportDir.path()
+            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path(percentEncoded: false))
+            appPath = appSupportDir.path(percentEncoded: false)
         } else {
             var isDir: ObjCBool = true
             doesExist = FileManager.default.fileExists(atPath: appSupportDir.path, isDirectory: &isDir)
@@ -119,14 +119,14 @@ internal struct Vocab {
         }
         
         if #available(iOS 16.0, *) {
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path())
+            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path(percentEncoded: false))
         } else {
             var isDir: ObjCBool = true
             doesExist = FileManager.default.fileExists(atPath: appSupportDir.path, isDirectory: &isDir)
         }
         
         if #available(iOS 16.0, *) {
-            let created = FileManager.default.createFile(atPath: localFilePath.path(), contents: data)
+            let created = FileManager.default.createFile(atPath: localFilePath.path(percentEncoded: false), contents: data)
             if !created {
                 throw TikTokenError.file
             }
@@ -154,7 +154,7 @@ internal struct Vocab {
         
         let doesExist: Bool
         if #available(iOS 16.0, *) {
-            doesExist = FileManager.default.fileExists(atPath: localFilePath.path())
+            doesExist = FileManager.default.fileExists(atPath: localFilePath.path(percentEncoded: false))
         } else {
             var isDir: ObjCBool = false
             doesExist = FileManager.default.fileExists(atPath: localFilePath.path, isDirectory: &isDir)
