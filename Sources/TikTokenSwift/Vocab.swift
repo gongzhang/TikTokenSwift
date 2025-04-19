@@ -9,6 +9,8 @@ enum SpecialTokenConstants: String {
 }
 
 internal struct Vocab {
+    private static let tokenizersDirectory = "TikTokenSwift"
+    
     public let name: String
     public let remoteUrlString: String
     public let encoderUrlString: String?
@@ -96,35 +98,39 @@ internal struct Vocab {
             throw TikTokenError.file
         }
         
-        let localFilePath: URL
+        // Create tokenizers directory path
+        let tokenizersDir: URL
         if #available(iOS 16.0, *) {
-            localFilePath = appSupportDir.appending(path: fileName, directoryHint: .notDirectory)
+            tokenizersDir = appSupportDir.appending(path: Self.tokenizersDirectory, directoryHint: .isDirectory)
         } else {
-            localFilePath = appSupportDir.appendingPathComponent(fileName, isDirectory: false)
+            tokenizersDir = appSupportDir.appendingPathComponent(Self.tokenizersDirectory, isDirectory: true)
         }
         
+        // Create tokenizers directory if it doesn't exist
         var doesExist: Bool
-        let appPath: String
+        let tokenizersPath: String
         if #available(iOS 16.0, *) {
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path(percentEncoded: false))
-            appPath = appSupportDir.path(percentEncoded: false)
+            doesExist = FileManager.default.fileExists(atPath: tokenizersDir.path(percentEncoded: false))
+            tokenizersPath = tokenizersDir.path(percentEncoded: false)
         } else {
             var isDir: ObjCBool = true
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path, isDirectory: &isDir)
-            appPath = appSupportDir.path
+            doesExist = FileManager.default.fileExists(atPath: tokenizersDir.path, isDirectory: &isDir)
+            tokenizersPath = tokenizersDir.path
         }
         
         if !doesExist {
-            try FileManager.default.createDirectory(atPath: appPath, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(atPath: tokenizersPath, withIntermediateDirectories: true)
         }
         
+        // Create file path within tokenizers directory
+        let localFilePath: URL
         if #available(iOS 16.0, *) {
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path(percentEncoded: false))
+            localFilePath = tokenizersDir.appending(path: fileName, directoryHint: .notDirectory)
         } else {
-            var isDir: ObjCBool = true
-            doesExist = FileManager.default.fileExists(atPath: appSupportDir.path, isDirectory: &isDir)
+            localFilePath = tokenizersDir.appendingPathComponent(fileName, isDirectory: false)
         }
         
+        // Create the file
         if #available(iOS 16.0, *) {
             let created = FileManager.default.createFile(atPath: localFilePath.path(percentEncoded: false), contents: data)
             if !created {
@@ -145,11 +151,20 @@ internal struct Vocab {
             throw TikTokenError.file
         }
         
+        // Create tokenizers directory path
+        let tokenizersDir: URL
+        if #available(iOS 16.0, *) {
+            tokenizersDir = appSupportDir.appending(path: Self.tokenizersDirectory, directoryHint: .isDirectory)
+        } else {
+            tokenizersDir = appSupportDir.appendingPathComponent(Self.tokenizersDirectory, isDirectory: true)
+        }
+        
+        // Create file path within tokenizers directory
         let localFilePath: URL
         if #available(iOS 16.0, *) {
-            localFilePath = appSupportDir.appending(path: fileName, directoryHint: .notDirectory)
+            localFilePath = tokenizersDir.appending(path: fileName, directoryHint: .notDirectory)
         } else {
-            localFilePath = appSupportDir.appendingPathComponent(fileName, isDirectory: false)
+            localFilePath = tokenizersDir.appendingPathComponent(fileName, isDirectory: false)
         }
         
         let doesExist: Bool
