@@ -61,7 +61,7 @@ final class TikTokenSwiftTests: XCTestCase {
         encodedString = try? enc!.encode(value: "0000000000")
         XCTAssertNotNil(encodedString)
         XCTAssertEqual(encodedString!, [8269, 405])
-
+        
         encodedString = try? enc!.encode(value: "00000000000")
         XCTAssertNotNil(encodedString)
         XCTAssertEqual(encodedString!, [8269, 830])
@@ -172,11 +172,33 @@ final class TikTokenSwiftTests: XCTestCase {
                 
                 // 验证两种方法的结果一致
                 XCTAssertEqual(
-                    tokenCount, 
-                    countResult, 
+                    tokenCount,
+                    countResult,
                     "Token count mismatch for model \(model) with string '\(testString)': expected \(tokenCount), got \(countResult)"
                 )
             }
+        }
+    }
+        
+    func testPerformance1() async throws {
+        let enc = try await TikTokenSwift.makeEncoding(vocab: .o200kBase)
+        let testString = String(repeating: "This is a longer text that will be repeated to test tokenization of lengthier content. ", count: 1000)
+        
+        measure {
+            do {
+                _ = try enc.encode(value: testString, treatSpecialAsNormal: true)
+            } catch {
+                XCTFail("Performance test failed with error: \(error)")
+            }
+        }
+    }
+
+    func testPerformance2() async throws {
+        let enc = try await TikTokenSwift.makeEncoding(vocab: .o200kBase)
+        let testString = String(repeating: "This is a longer text that will be repeated to test tokenization of lengthier content. ", count: 1000)
+        
+        measure {
+            _ = enc.countTokens(plain: testString)
         }
     }
     

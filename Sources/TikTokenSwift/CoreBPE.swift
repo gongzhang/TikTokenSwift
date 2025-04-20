@@ -96,7 +96,6 @@ class CoreBPE {
     }
     
     func countUnmatchedString(piece: [UInt8]) -> Int {
-        // TOOD: optimization
         var parts:[[UInt8]] = piece.map({Array([$0])})
         var initialRanksList: [Int] = []
         let invalidVal = Int.max
