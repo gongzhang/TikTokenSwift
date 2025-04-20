@@ -13,7 +13,7 @@ class CoreBPE {
         self.regexTls = regexTls
     }
     
-    func encodeOrdinaryNative(text: String) throws -> [Int] {
+    func encodeOrdinaryNative(text: String) -> [Int] {
         let regex = regexTls.first!
         var theTokens: [Int] = []
         for mat in regex.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
@@ -24,14 +24,31 @@ class CoreBPE {
                     continue
                 }
                 // Parts is really just an array of strings
-                let calculatedTokens = try decodeUnmatchedString(piece: piece)
+                let calculatedTokens = decodeUnmatchedString(piece: piece)
                 theTokens.append(contentsOf: calculatedTokens)
             }
         }
         return theTokens
     }
     
-    func decodeUnmatchedString(piece: [UInt8]) throws -> [Int] {
+    func countTokensOrdinaryNative(text: String) -> Int {
+        let regex = regexTls.first!
+        var tokenCount = 0
+        for mat in regex.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
+            if let range = Range(mat.range, in: text) {
+                let piece = Array(text[range].utf8)
+                if encoder[piece] != nil {
+                    tokenCount += 1
+                    continue
+                }
+                let tokensCount = countUnmatchedString(piece: piece)
+                tokenCount += tokensCount
+            }
+        }
+        return tokenCount
+    }
+    
+    func decodeUnmatchedString(piece: [UInt8]) -> [Int] {
         var parts:[[UInt8]] = piece.map({Array([$0])})
         var initialRanksList: [Int] = []
         let invalidVal = Int.max
@@ -57,9 +74,7 @@ class CoreBPE {
                 break
             }
             if merging {
-                if (minIndex == -1) {
-                    throw TikTokenError.bpeParse
-                }
+                assert(minIndex != -1)
 
                 let mergedVal = parts[minIndex] + parts[minIndex + 1]
                 parts[minIndex] = mergedVal
@@ -78,6 +93,59 @@ class CoreBPE {
         }
         let tokens = parts.compactMap({encoder[$0]})
         return tokens
+    }
+    
+    func countUnmatchedString(piece: [UInt8]) -> Int {
+        // TOOD: optimization
+        var parts:[[UInt8]] = piece.map({Array([$0])})
+        var initialRanksList: [Int] = []
+        let invalidVal = Int.max
+        for num in 0..<parts.count - 1 {
+            initialRanksList.append(encoder[parts[num] + parts[num + 1]] ?? invalidVal)
+        }
+        var merging = true
+        while merging {
+
+            var minIndex = -1
+            var minRank = -1
+            for num in 0..<parts.count - 1 {
+                let currRank = initialRanksList[num]
+                if currRank != invalidVal {
+                    if minRank == -1 || currRank < minRank {
+                        minRank = currRank
+                        minIndex = num
+                    }
+                }
+            }
+            if minRank == -1 {
+                merging = false
+                break
+            }
+            if merging {
+                assert(minIndex != -1)
+                
+                let mergedVal = parts[minIndex] + parts[minIndex + 1]
+                parts[minIndex] = mergedVal
+                parts.remove(at: minIndex + 1)
+                if minIndex != parts.count - 1 {
+                    let newRank = encoder[parts[minIndex] + parts[minIndex + 1]] ?? invalidVal
+                    initialRanksList[minIndex] = newRank
+                    initialRanksList.remove(at: minIndex + 1)
+                }
+                if minIndex != 0 {
+                    let newRank = encoder[parts[minIndex - 1] + parts[minIndex]] ?? invalidVal
+                    initialRanksList[minIndex - 1] = newRank
+                }
+            }
+        }
+        
+        var count = 0
+        for part in parts {
+            if encoder[part] != nil {
+                count += 1
+            }
+        }
+        return count
     }
     
     func decodeNative(tokens: [Int]) -> String {

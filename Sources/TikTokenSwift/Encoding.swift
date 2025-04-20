@@ -37,10 +37,16 @@ public class Encoding {
             }
         }
         
-        return try coreBpe.encodeOrdinaryNative(text: value.convertFromPythonHexCodeToUnicodeCode().convertFromUnicodeString() ?? value)
+        return coreBpe.encodeOrdinaryNative(text: value.convertFromPythonHexCodeToUnicodeCode().convertFromUnicodeString() ?? value)
     }
     
     public func decode(value: [Int]) -> String {
         coreBpe.decodeNative(tokens: value)
     }
+    
+    public func countTokens(plain value: String) -> Int {
+        let processedText = value.convertFromPythonHexCodeToUnicodeCode().convertFromUnicodeString() ?? value
+        return coreBpe.countTokensOrdinaryNative(text: processedText)
+    }
+    
 }
